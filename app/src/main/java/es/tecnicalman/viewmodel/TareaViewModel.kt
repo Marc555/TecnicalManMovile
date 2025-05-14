@@ -1,11 +1,13 @@
 package es.tecnicalman.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import es.tecnicalman.api.RetrofitInstance
 import es.tecnicalman.model.Tarea
+import es.tecnicalman.model.TareaCreate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -51,12 +53,26 @@ class TareaViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
+
             try {
-                val response = tareaService.createTask(tarea)
+                // Transformar el objeto Tarea en un objeto TareaCreate
+                val tareaCreate = TareaCreate(
+                    titulo = tarea.titulo,
+                    descripcion = tarea.descripcion,
+                    encargado = tarea.encargado,
+                    direccion = tarea.direccion,
+                    estado = tarea.estado,
+                    fechaHora = tarea.fechaHora
+                )
+
+                val response = tareaService.createTask(tareaCreate)
                 if (response.isSuccessful) {
                     fetchTasks() // Actualiza la lista después de crear
                 } else {
                     _error.value = "Error al crear tarea: ${response.message()}"
+                    Log.e("TareaViewModel", "Error al crear tarea: ${response.message()}")
+                    Log.e("TareaViewModel", "Código de respuesta: ${response.code()}")
+                    Log.e("TareaViewModel", "Cuerpo del objeto: ${tareaCreate.toString()}")
                 }
             } catch (e: Exception) {
                 _error.value = "Excepción: ${e.message}"
