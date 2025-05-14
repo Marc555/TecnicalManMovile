@@ -14,4 +14,7 @@ interface AuthService {
 
     @GET("auth/validate")
     suspend fun validateToken(@Header("Authorization") token: String): Response<String>
+
+    @POST("auth/forgot-password")
+    suspend fun forgotPassword(@Body request: Map<String, String>): Response<Map<String, String>>
 }

@@ -16,8 +16,12 @@ import kotlinx.coroutines.flow.StateFlow
 
 @RequiresApi(Build.VERSION_CODES.O)
 class AuthViewModel(private val authService: AuthService = RetrofitInstance.authService) : ViewModel() {
+
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
+
+    private val _forgotPasswordState = MutableStateFlow<PasswordState>(PasswordState.Idle)
+    val forgotPasswordState: StateFlow<PasswordState> = _forgotPasswordState
 
     fun login(email: String, password: String, context: Context) {
         viewModelScope.launch {
@@ -64,6 +68,31 @@ class AuthViewModel(private val authService: AuthService = RetrofitInstance.auth
             }
         }
     }
+
+
+
+    fun forgotPassword(email: String) {
+        viewModelScope.launch {
+            _forgotPasswordState.value = PasswordState.Loading
+            try {
+                val response = authService.forgotPassword(mapOf("email" to email))
+                if (response.isSuccessful) {
+                    _forgotPasswordState.value = PasswordState.Success("Correo enviado con éxito")
+                } else {
+                    _forgotPasswordState.value = PasswordState.Error("Error: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                _forgotPasswordState.value = PasswordState.Error("Error de conexión: ${e.message}")
+            }
+        }
+    }
+}
+
+sealed class PasswordState {
+    object Idle : PasswordState()
+    object Loading : PasswordState()
+    data class Success(val message: String) : PasswordState()
+    data class Error(val message: String) : PasswordState()
 }
 
 sealed class LoginState {

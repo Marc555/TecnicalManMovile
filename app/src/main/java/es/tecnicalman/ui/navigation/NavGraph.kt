@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import es.tecnicalman.ui.screen.CalendarScreen
+import es.tecnicalman.ui.screen.ForgotPasswordScreen
 import es.tecnicalman.ui.screen.HomeScreen
 import es.tecnicalman.ui.screen.LoginScreen
 import es.tecnicalman.ui.screen.SplashScreen
@@ -23,6 +24,9 @@ fun AppNavGraph(navController: NavHostController, tareaViewModel: TareaViewModel
         }
         composable("login") {
             LoginScreen(navController)
+        }
+        composable("forgotPassword") {
+            ForgotPasswordScreen(navController)
         }
         composable("home") {
             HomeScreen(navController)

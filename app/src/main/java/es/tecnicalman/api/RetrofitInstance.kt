@@ -14,6 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.lang.reflect.Type
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 // Deserializador para convertir un timestamp a Instant
 class InstantDeserializer : JsonDeserializer<Instant> {
@@ -34,6 +35,9 @@ object RetrofitInstance {
         .create()
 
     private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS) // Tiempo de espera para la conexión
+        .readTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera para leer la respuesta
+        .writeTimeout(30, TimeUnit.SECONDS)   // Tiempo de espera para escribir la solicitud
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         })

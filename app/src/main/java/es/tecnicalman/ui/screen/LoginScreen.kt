@@ -73,6 +73,16 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        TextButton(
+            onClick = {
+                navController.navigate("forgotPassword")
+            }
+        ) {
+            Text("¿Has olvidado tu contraseña?")
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Button(
             onClick = {
                 authViewModel.login(email, password, context)
