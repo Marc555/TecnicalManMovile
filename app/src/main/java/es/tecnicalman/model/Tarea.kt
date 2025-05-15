@@ -3,6 +3,8 @@ package es.tecnicalman.model
 import android.os.Build
 import androidx.annotation.RequiresApi
 import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 data class Tarea(
     val id: Long,
@@ -17,5 +19,13 @@ data class Tarea(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getFechaHoraAsInstant(): Instant {
         return Instant.ofEpochSecond(fechaHora.toLong())
+    }
+
+    // Metodo para obtener fechaHora en formato legible
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getFormattedFechaHora(): String {
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+            .withZone(ZoneId.systemDefault()) // Usa la zona horaria del sistema
+        return formatter.format(getFechaHoraAsInstant())
     }
 }

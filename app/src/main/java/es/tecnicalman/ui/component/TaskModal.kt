@@ -59,6 +59,8 @@ fun TaskModal(
                             ) {
                                 Column(Modifier.padding(16.dp)) {
                                     Text(task.titulo, style = MaterialTheme.typography.h6)
+                                    Text("Fecha: ${task.getFormattedFechaHora()}")
+                                    Text("Descripcoon: ${task.descripcion}")
                                     Text("Encargado: ${task.encargado}")
                                     Text("Estado: ${task.estado}")
                                     Text("Dirección: ${task.direccion}")

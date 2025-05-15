@@ -4,7 +4,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.*
-import es.tecnicalman.util.TokenManager
 import es.tecnicalman.util.TokenProvider
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
