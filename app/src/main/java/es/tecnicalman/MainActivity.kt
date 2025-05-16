@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
 
         TokenManager.init(this)
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContent {
             TecnicalmanTheme(darkTheme = false) {
                 val navController = rememberNavController()
