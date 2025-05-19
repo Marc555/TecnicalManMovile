@@ -15,11 +15,30 @@ import java.lang.reflect.Type
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-// Deserializador para convertir un timestamp a Instant
-class InstantDeserializer : JsonDeserializer<Instant> {
+// Serializador y deserializador para Instant
+class InstantAdapter : JsonSerializer<Instant?>, JsonDeserializer<Instant?> {
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Instant {
-        return Instant.ofEpochMilli(json.asLong)
+    override fun serialize(
+        src: Instant?,
+        typeOfSrc: Type?,
+        context: JsonSerializationContext?
+    ): JsonElement? {
+        return src?.let { JsonPrimitive(it.toString()) } ?: JsonNull.INSTANCE
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun deserialize(
+        json: JsonElement?,
+        typeOfT: Type?,
+        context: JsonDeserializationContext?
+    ): Instant? {
+        return if (json == null || json.isJsonNull) null
+        // Permite aceptar tanto string ISO como long epoch
+        else if (json.isJsonPrimitive && json.asJsonPrimitive.isString)
+            Instant.parse(json.asString)
+        else if (json.isJsonPrimitive && json.asJsonPrimitive.isNumber)
+            Instant.ofEpochMilli(json.asLong)
+        else null
     }
 }
 
@@ -28,15 +47,16 @@ object RetrofitInstance {
 
     private const val BASE_URL = "http://10.0.2.2:8080/api/"
 
+    // Usa el adaptador completo para serializar y deserializar Instant correctamente
     @RequiresApi(Build.VERSION_CODES.O)
     private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(Instant::class.java, InstantDeserializer())
+        .registerTypeAdapter(Instant::class.java, InstantAdapter())
         .create()
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS) // Tiempo de espera para la conexión
-        .readTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera para leer la respuesta
-        .writeTimeout(30, TimeUnit.SECONDS)   // Tiempo de espera para escribir la solicitud
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         })
@@ -46,7 +66,7 @@ object RetrofitInstance {
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
 
-            val path = original.url.encodedPath // Obtener la ruta de la solicitud
+            val path = original.url.encodedPath
             Log.d("RetrofitInstance", "Request Path: $path")
 
             // Excluir la cabecera de autenticación para rutas específicas, como "/auth"
@@ -98,5 +118,15 @@ object RetrofitInstance {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ClienteService::class.java)
+    }
+
+    val presupuestoApiService: PresupuestoApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+            .create(PresupuestoApiService::class.java)
     }
 }

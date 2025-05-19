@@ -1,26 +1,28 @@
 package es.tecnicalman.ui.navigation
 
-import ClienteDetailScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import es.tecnicalman.ui.screen.CalendarScreen
 import es.tecnicalman.ui.screen.ForgotPasswordScreen
 import es.tecnicalman.ui.screen.HomeScreen
 import es.tecnicalman.ui.screen.LoginScreen
 import es.tecnicalman.ui.screen.SplashScreen
+import es.tecnicalman.ui.screen.cliente.ClienteDetailScreen
 import es.tecnicalman.ui.screen.cliente.ClienteFormScreen
 import es.tecnicalman.ui.screen.cliente.ClienteListScreen
-import es.tecnicalman.viewmodel.TareaViewModel
-import java.time.LocalDate
+import es.tecnicalman.ui.screen.presupuesto.PresupuestoDetailScreen
+import es.tecnicalman.ui.screen.presupuesto.PresupuestoFormScreen
+import es.tecnicalman.ui.screen.presupuesto.PresupuestoListScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavGraph(navController: NavHostController, tareaViewModel: TareaViewModel = viewModel()) {
+fun AppNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
             SplashScreen(navController)
@@ -77,6 +79,36 @@ fun AppNavGraph(navController: NavHostController, tareaViewModel: TareaViewModel
             ClienteFormScreen(navController, clienteId = clienteId) {
                 navController.popBackStack()
             }
-            }
+        }
+
+
+        // PRESUPUESTOS
+        composable("presupuestos") {
+            // Lista de presupuestos
+            PresupuestoListScreen(navController, onPresupuestoClick = { presupuesto ->
+                navController.navigate("presupuestoDetails/${presupuesto.id}")
+            })
+        }
+
+        composable("presupuestoDetails/{presupuestoId}",
+            arguments = listOf(navArgument("presupuestoId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val presupuestoId = backStackEntry.arguments?.getLong("presupuestoId") ?: 0L
+            PresupuestoDetailScreen(navController = navController, presupuestoId = presupuestoId)
+        }
+
+
+        // Crear un nuevo presupuesto
+        composable("presupuestoForm") {
+            PresupuestoFormScreen(
+                navController)
+        }
+
+        // Editar un presupuesto existente
+        composable("presupuestoForm/edit/{presupuestoId}") {
+            PresupuestoFormScreen(
+                navController,
+                presupuestoId = it.arguments?.getString("presupuestoId")?.toLongOrNull())
+        }
     }
 }

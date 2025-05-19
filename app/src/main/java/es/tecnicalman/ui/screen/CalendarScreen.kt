@@ -7,8 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Home
@@ -26,7 +24,6 @@ import es.tecnicalman.ui.component.TaskModal
 import es.tecnicalman.viewmodel.TareaViewModel
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
