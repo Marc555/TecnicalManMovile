@@ -1,4 +1,4 @@
-package es.tecnicalman.ui.screen.presupuesto
+package es.tecnicalman.ui.screen.albaran
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,24 +19,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import es.tecnicalman.model.Presupuesto
-import es.tecnicalman.viewmodel.PresupuestoViewModel
+import es.tecnicalman.model.Albaran
+import es.tecnicalman.viewmodel.AlbaranViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PresupuestoListScreen(
+fun AlbaranListScreen(
     navController: NavController,
-    onPresupuestoClick: (Presupuesto) -> Unit,
-    viewModel: PresupuestoViewModel = viewModel()
+    onAlbaranClick: (Albaran) -> Unit,
+    viewModel: AlbaranViewModel = viewModel()
 ) {
-    viewModel.loadPresupuestos()
-    val presupuestos by viewModel.presupuestos.collectAsState()
+    viewModel.loadAlbaranes()
+    val albaranes by viewModel.albaranes.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Lista de Presupuestos") },
+                title = { Text("Lista de Albaranes") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("home") }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver",
@@ -47,10 +45,9 @@ fun PresupuestoListScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        navController.navigate("presupuestoForm")
+                        navController.navigate("albaranForm")
                     }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Crear",
-                            tint = Color.White)
+                        Icon(Icons.Filled.Add, contentDescription = "Crear", tint = Color.White)
                     }
                 }
             )
@@ -63,15 +60,15 @@ fun PresupuestoListScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(presupuestos) { presupuesto ->
-                PresupuestoCard(presupuesto = presupuesto, onClick = { onPresupuestoClick(presupuesto) })
+            items(albaranes) { albaran ->
+                AlbaranCard(albaran = albaran, onClick = { onAlbaranClick(albaran) })
             }
         }
     }
 }
 
 @Composable
-fun PresupuestoCard(presupuesto: Presupuesto, onClick: () -> Unit) {
+fun AlbaranCard(albaran: Albaran, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,17 +82,17 @@ fun PresupuestoCard(presupuesto: Presupuesto, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = presupuesto.titulo,
+                text = albaran.titulo,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Fecha: ${presupuesto.fechaEmitida?.toString() ?: "No emitida"}",
+                text = "Fecha: ${albaran.fechaEmitida?.toString() ?: "No emitida"}",
                 style = MaterialTheme.typography.bodySmall
             )
             Text(
-                text = "Estado: ${presupuesto.estado}",
+                text = "Estado: ${albaran.estado}",
                 style = MaterialTheme.typography.bodySmall
             )
         }

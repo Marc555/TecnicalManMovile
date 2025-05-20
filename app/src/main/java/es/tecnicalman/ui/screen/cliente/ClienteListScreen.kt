@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package es.tecnicalman.ui.screen.cliente
 
 import android.os.Build
@@ -7,16 +9,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.PlusOne
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.tecnicalman.viewmodel.ClienteViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -52,15 +51,15 @@ fun ClienteListScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             TopAppBar(
-                backgroundColor = androidx.compose.material.MaterialTheme.colors.surface,
-                title = { androidx.compose.material.Text("Lista de cliente") },
-                actions = {
-                    // Botón para ir al Home
+                title = { Text("Lista de clientes") },
+                navigationIcon = {
                     IconButton(onClick = { navController.navigate("home") }) {
-                        Icon(Icons.Default.Home, contentDescription = "Ir al Home")
+                        Icon(Icons.Default.Home, contentDescription = "Ir al Home", tint = Color.White)
                     }
+                },
+                actions = {
                     IconButton(onClick = { navController.navigate("clienteForm") }) {
-                        Icon(Icons.Default.Add, contentDescription = "Crear cliente")
+                        Icon(Icons.Default.Add, contentDescription = "Crear cliente", tint = Color.White)
                     }
                 }
             )
@@ -76,7 +75,6 @@ fun ClienteListScreen(
                 Text(text = "NIF", color = Color.Black)
             }
 
-            // Lista con scroll
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

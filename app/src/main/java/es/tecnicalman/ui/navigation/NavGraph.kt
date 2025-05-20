@@ -19,6 +19,12 @@ import es.tecnicalman.ui.screen.cliente.ClienteListScreen
 import es.tecnicalman.ui.screen.presupuesto.PresupuestoDetailScreen
 import es.tecnicalman.ui.screen.presupuesto.PresupuestoFormScreen
 import es.tecnicalman.ui.screen.presupuesto.PresupuestoListScreen
+import es.tecnicalman.ui.screen.albaran.AlbaranDetailScreen
+import es.tecnicalman.ui.screen.albaran.AlbaranFormScreen
+import es.tecnicalman.ui.screen.albaran.AlbaranListScreen
+import es.tecnicalman.ui.screen.factura.FacturaDetailScreen
+import es.tecnicalman.ui.screen.factura.FacturaFormScreen
+import es.tecnicalman.ui.screen.factura.FacturaListScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -109,6 +115,58 @@ fun AppNavGraph(navController: NavHostController) {
             PresupuestoFormScreen(
                 navController,
                 presupuestoId = it.arguments?.getString("presupuestoId")?.toLongOrNull())
+        }
+
+        // ALBARANES
+        composable("albaranes") {
+            AlbaranListScreen(navController, onAlbaranClick = { albaran ->
+                navController.navigate("albaranDetails/${albaran.id}")
+            })
+        }
+
+        composable("albaranDetails/{albaranId}",
+            arguments = listOf(navArgument("albaranId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val albaranId = backStackEntry.arguments?.getLong("albaranId") ?: 0L
+            AlbaranDetailScreen(navController = navController, albaranId = albaranId)
+        }
+
+        // Crear un nuevo albarán
+        composable("albaranForm") {
+            AlbaranFormScreen(navController)
+        }
+
+        // Editar un albarán existente
+        composable("albaranForm/edit/{albaranId}") {
+            AlbaranFormScreen(
+                navController,
+                albaranId = it.arguments?.getString("albaranId")?.toLongOrNull())
+        }
+
+        // FACTURAS
+        composable("facturas") {
+            FacturaListScreen(navController, onFacturaClick = { factura ->
+                navController.navigate("facturaDetails/${factura.id}")
+            })
+        }
+
+        composable("facturaDetails/{facturaId}",
+            arguments = listOf(navArgument("facturaId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val facturaId = backStackEntry.arguments?.getLong("facturaId") ?: 0L
+            FacturaDetailScreen(navController = navController, facturaId = facturaId)
+        }
+
+        // Crear una nueva factura
+        composable("facturaForm") {
+            FacturaFormScreen(navController)
+        }
+
+        // Editar una factura existente
+        composable("facturaForm/edit/{facturaId}") {
+            FacturaFormScreen(
+                navController,
+                facturaId = it.arguments?.getString("facturaId")?.toLongOrNull())
         }
     }
 }

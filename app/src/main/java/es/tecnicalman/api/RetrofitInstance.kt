@@ -129,4 +129,24 @@ object RetrofitInstance {
             .build()
             .create(PresupuestoApiService::class.java)
     }
+
+    val albaranApiService: AlbaranApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+            .create(AlbaranApiService::class.java)
+    }
+
+    val facturaApiService: FacturaApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+            .create(FacturaApiService::class.java)
+    }
 }

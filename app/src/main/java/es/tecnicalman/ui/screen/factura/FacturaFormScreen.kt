@@ -1,4 +1,4 @@
-package es.tecnicalman.ui.screen.presupuesto
+package es.tecnicalman.ui.screen.factura
 
 import android.os.Build
 import android.util.Log
@@ -27,36 +27,34 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import es.tecnicalman.model.*
 import es.tecnicalman.viewmodel.ClienteViewModel
-import es.tecnicalman.viewmodel.PresupuestoViewModel
+import es.tecnicalman.viewmodel.FacturaViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PresupuestoFormScreen(
+fun FacturaFormScreen(
     navController: NavHostController,
-    presupuestoId: Long? = null,
-    presupuestoViewModel: PresupuestoViewModel = viewModel(),
+    facturaId: Long? = null,
+    facturaViewModel: FacturaViewModel = viewModel(),
     clienteViewModel: ClienteViewModel = viewModel()
 ) {
-    val TAG = "PresupuestoFormScreen"
+    val TAG = "FacturaFormScreen"
 
-    // Form state
     var titulo by remember { mutableStateOf("") }
     var condiciones by remember { mutableStateOf("") }
-    var estado by remember { mutableStateOf(Presupuesto.EstadoPresupuesto.BORRADOR) }
+    var estado by remember { mutableStateOf(Factura.EstadoFactura.BORRADOR) }
     var idCliente by remember { mutableStateOf<Long?>(null) }
-    var lineas by remember { mutableStateOf<List<LineaPresupuesto>>(emptyList()) }
-    var lineasEliminadas by remember { mutableStateOf<List<LineaPresupuesto>>(emptyList()) }
+    var lineas by remember { mutableStateOf<List<LineaFactura>>(emptyList()) }
+    var lineasEliminadas by remember { mutableStateOf<List<LineaFactura>>(emptyList()) }
 
-    // Línea dialog state
     var showLineaDialog by remember { mutableStateOf(false) }
     var lineaEditIndex by remember { mutableStateOf<Int?>(null) }
     var nuevaLinea by remember {
         mutableStateOf(
-            LineaPresupuesto(
+            LineaFactura(
                 id = null,
-                idPresupuesto = 0,
+                idFactura = 0,
                 descripcion = "",
                 cantidad = 1,
                 precioUnitario = 0.0
@@ -64,27 +62,25 @@ fun PresupuestoFormScreen(
         )
     }
 
-    // Cargar presupuesto y líneas solo si la ID no es null (solo edición)
-    val isLoadingPresupuesto by presupuestoViewModel.isLoading.collectAsState()
+    val isLoadingFactura by facturaViewModel.isLoading.collectAsState()
     val isLoadingCliente by clienteViewModel.isLoading.collectAsState()
 
-    if (presupuestoId != null) {
-        LaunchedEffect(presupuestoId) {
-            presupuestoViewModel.loadPresupuestoById(presupuestoId)
-            presupuestoViewModel.loadLineasByPresupuestoId(presupuestoId)
+    if (facturaId != null) {
+        LaunchedEffect(facturaId) {
+            facturaViewModel.loadFacturaById(facturaId)
+            facturaViewModel.loadLineasByFacturaId(facturaId)
         }
     }
     LaunchedEffect(Unit) {
         clienteViewModel.fetchClientes()
     }
 
-    val presupuesto by presupuestoViewModel.presupuestoDetail.collectAsState()
-    val lineasViewModel by presupuestoViewModel.lineasPresupuestoDetail.collectAsState()
+    val factura by facturaViewModel.facturaDetail.collectAsState()
+    val lineasViewModel by facturaViewModel.lineasFacturaDetail.collectAsState()
     val clientes by clienteViewModel.clientes.collectAsState()
 
-    // Solo actualiza los campos si hay datos de presupuesto y linea (evita sobrescribir en edición)
-    LaunchedEffect(presupuesto) {
-        presupuesto?.let {
+    LaunchedEffect(factura) {
+        factura?.let {
             titulo = it.titulo
             condiciones = it.condiciones
             estado = it.estado
@@ -92,7 +88,7 @@ fun PresupuestoFormScreen(
         }
     }
     LaunchedEffect(lineasViewModel) {
-        if (presupuestoId != null) {
+        if (facturaId != null) {
             lineas = lineasViewModel
         }
     }
@@ -117,7 +113,7 @@ fun PresupuestoFormScreen(
         unfocusedIndicatorColor = Color.Black.copy(alpha = 0.3f)
     )
 
-    if (isLoadingPresupuesto || isLoadingCliente) {
+    if (isLoadingFactura || isLoadingCliente) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
@@ -127,7 +123,7 @@ fun PresupuestoFormScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if (presupuestoId == null) "Nuevo Presupuesto" else "Editar Presupuesto",
+                            text = if (facturaId == null) "Nueva Factura" else "Editar Factura",
                             color = MaterialTheme.colorScheme.background
                         )
                     },
@@ -150,7 +146,6 @@ fun PresupuestoFormScreen(
                     .background(MaterialTheme.colorScheme.background)
             ) {
                 item {
-                    // Selección de cliente con DropdownMenu
                     var clienteExpanded by remember { mutableStateOf(false) }
                     Column {
                         Text("Cliente", style = MaterialTheme.typography.titleMedium.merge(textStyle))
@@ -197,7 +192,6 @@ fun PresupuestoFormScreen(
                             }
                         }
 
-                        // Detalles del cliente seleccionado
                         clienteSeleccionado?.let { cliente ->
                             Column(
                                 modifier = Modifier
@@ -218,7 +212,6 @@ fun PresupuestoFormScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Título del presupuesto
                     OutlinedTextField(
                         value = titulo,
                         onValueChange = { titulo = it },
@@ -230,7 +223,6 @@ fun PresupuestoFormScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Condiciones
                     OutlinedTextField(
                         value = condiciones,
                         onValueChange = { condiciones = it },
@@ -245,7 +237,6 @@ fun PresupuestoFormScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Estado con DropdownMenu
                     var estadoExpanded by remember { mutableStateOf(false) }
                     Column {
                         Text("Estado", style = MaterialTheme.typography.titleMedium.merge(textStyle))
@@ -274,7 +265,7 @@ fun PresupuestoFormScreen(
                                 .fillMaxWidth(0.5f)
                                 .background(Color.White)
                         ) {
-                            Presupuesto.EstadoPresupuesto.values().forEach { estadoOption ->
+                            Factura.EstadoFactura.values().forEach { estadoOption ->
                                 DropdownMenuItem(
                                     text = { Text(estadoOption.toString(), style = textStyle) },
                                     onClick = {
@@ -288,14 +279,12 @@ fun PresupuestoFormScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Líneas de presupuesto
-                    Text("Líneas de presupuesto",
+                    Text("Líneas de factura",
                         style = MaterialTheme.typography.titleLarge.merge(textStyle))
                 }
 
-                // Lista de líneas
                 items(lineas) { linea ->
-                    LineaPresupuestoItem(
+                    LineaFacturaItem(
                         linea = linea,
                         onEdit = {
                             nuevaLinea = linea.copy()
@@ -315,12 +304,11 @@ fun PresupuestoFormScreen(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Botón para añadir línea
                     Button(
                         onClick = {
-                            nuevaLinea = LineaPresupuesto(
+                            nuevaLinea = LineaFactura(
                                 id = null,
-                                idPresupuesto = presupuestoId ?: 0,
+                                idFactura = facturaId ?: 0,
                                 descripcion = "",
                                 cantidad = 1,
                                 precioUnitario = 0.0
@@ -340,7 +328,6 @@ fun PresupuestoFormScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Totales
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.End
@@ -353,11 +340,10 @@ fun PresupuestoFormScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Botón guardar
                     Button(
                         onClick = {
-                            val presupuesto = Presupuesto(
-                                id = presupuestoId,
+                            val factura = Factura(
+                                id = facturaId,
                                 idCliente = idCliente ?: 0,
                                 titulo = titulo,
                                 condiciones = condiciones,
@@ -368,36 +354,34 @@ fun PresupuestoFormScreen(
 
                             scope.launch {
                                 try {
-                                    Log.d(TAG, "Iniciando guardado de presupuesto y líneas")
-                                    if (presupuestoId == null) {
-                                        // Crear presupuesto y luego las líneas
-                                        presupuestoViewModel.createPresupuestoWithLineas(
-                                            presupuesto = presupuesto,
+                                    Log.d(TAG, "Iniciando guardado de factura y líneas")
+                                    if (facturaId == null) {
+                                        facturaViewModel.createFacturaWithLineas(
+                                            factura = factura,
                                             lineas = lineas
                                         )
-                                        Log.d(TAG, "Guardado de presupuesto y líneas finalizado (nuevo presupuesto)")
+                                        Log.d(TAG, "Guardado de factura y líneas finalizado (nueva factura)")
                                     } else {
-                                        // Actualizar presupuesto y líneas
-                                        presupuesto.id?.let { id ->
-                                            presupuestoViewModel.updatePresupuesto(id, presupuesto)
+                                        factura.id?.let { id ->
+                                            facturaViewModel.updateFactura(id, factura)
                                             lineas.forEach { linea ->
                                                 if (linea.id == null) {
-                                                    presupuestoViewModel.createLineaPresupuesto(linea.copy(idPresupuesto = id))
+                                                    facturaViewModel.createLineaFactura(linea.copy(idFactura = id))
                                                 } else {
-                                                    presupuestoViewModel.updateLineaPresupuesto(linea.id, linea)
+                                                    facturaViewModel.updateLineaFactura(linea.id, linea)
                                                 }
                                             }
                                             lineasEliminadas.forEach { linea ->
                                                 linea.id?.let { lineaId ->
-                                                    presupuestoViewModel.deleteLineaPresupuesto(lineaId)
+                                                    facturaViewModel.deleteLineaFactura(lineaId)
                                                 }
                                             }
-                                            Log.d(TAG, "Guardado de presupuesto y líneas finalizado (edición)")
+                                            Log.d(TAG, "Guardado de factura y líneas finalizado (edición)")
                                         }
                                     }
                                     navController.popBackStack()
                                 } catch (e: Exception) {
-                                    Log.e(TAG, "Error guardando presupuesto y líneas", e)
+                                    Log.e(TAG, "Error guardando factura y líneas", e)
                                 }
                             }
                         },
@@ -408,14 +392,13 @@ fun PresupuestoFormScreen(
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Guardar Presupuesto", style = textStyle.copy(color = Color.White))
+                        Text("Guardar Factura", style = textStyle.copy(color = Color.White))
                     }
                 }
             }
         }
     }
 
-    // Diálogo para añadir/editar línea
     if (showLineaDialog) {
         AlertDialog(
             onDismissRequest = { showLineaDialog = false },
@@ -503,8 +486,8 @@ fun PresupuestoFormScreen(
 }
 
 @Composable
-fun LineaPresupuestoItem(
-    linea: LineaPresupuesto,
+fun LineaFacturaItem(
+    linea: LineaFactura,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     textStyle: TextStyle

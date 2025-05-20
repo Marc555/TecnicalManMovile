@@ -1,9 +1,15 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package es.tecnicalman.ui.screen.cliente
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -32,72 +38,80 @@ fun ClienteDetailScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val cliente by viewModel.clienteSeleccionado.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
         TopAppBar(
-            backgroundColor = MaterialTheme.colors.surface,
+            title = { Text("Detalles de cliente", fontWeight = FontWeight.Bold) },
             navigationIcon = {
                 IconButton(onClick = { navController.navigate("clientes") }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver a clientes")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Volver a clientes", tint = Color.White
+                    )
                 }
             },
-            title = { Text("Detalles de cliente", fontWeight = FontWeight.Bold) },
             actions = {
                 IconButton(onClick = { navController.navigate("clienteForm/$clienteId") }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Editar cliente")
+                    Icon(Icons.Default.Edit, contentDescription = "Editar cliente", tint = Color.White)
                 }
                 IconButton(onClick = { showDeleteConfirmation = true }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar cliente")
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Eliminar cliente",
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
 
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else {
-            cliente?.let {
-                InfoSection("Información Principal") {
-                    InfoRow("ID", it.id.toString())
-                    InfoRow("Nombre", it.nombre)
-                    InfoRow("NIF", it.nif)
-                    InfoRow("Fecha de Creación", it.fechaCreacionFormateada())
-                }
-                InfoSection("Dirección") {
-                    InfoRow("Dirección", it.direccion)
-                    InfoRow("Ciudad", it.ciudad)
-                    InfoRow("Código Postal", it.codigoPostal)
-                    InfoRow("Provincia", it.provincia)
-                }
-                InfoSection("Contacto") {
-                    InfoRow("Email", it.email)
-                    InfoRow("Teléfono", it.telefono)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                cliente?.let {
+                    InfoSection("Información Principal") {
+                        InfoRow("ID", it.id.toString())
+                        InfoRow("Nombre", it.nombre)
+                        InfoRow("NIF", it.nif)
+                        InfoRow("Fecha de Creación", it.fechaCreacionFormateada())
+                    }
+                    InfoSection("Dirección") {
+                        InfoRow("Dirección", it.direccion)
+                        InfoRow("Ciudad", it.ciudad)
+                        InfoRow("Código Postal", it.codigoPostal)
+                        InfoRow("Provincia", it.provincia)
+                    }
+                    InfoSection("Contacto") {
+                        InfoRow("Email", it.email)
+                        InfoRow("Teléfono", it.telefono)
+                    }
                 }
             }
-        }
 
-        // Diálogo de confirmación
-        if (showDeleteConfirmation) {
-            AlertDialog(
-                onDismissRequest = { showDeleteConfirmation = false },
-                title = { Text("Confirmar eliminación") },
-                text = { Text("¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showDeleteConfirmation = false
-                        viewModel.deleteCliente(clienteId)
-                        navController.navigate("clientes")
-                    }) {
-                        Text("Eliminar", color = Color.Red)
+            if (showDeleteConfirmation) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirmation = false },
+                    title = { Text("Confirmar eliminación") },
+                    text = { Text("¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showDeleteConfirmation = false
+                            viewModel.deleteCliente(clienteId)
+                            navController.navigate("clientes")
+                        }) {
+                            Text("Eliminar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteConfirmation = false }) {
+                            Text("Cancelar")
+                        }
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteConfirmation = false }) {
-                        Text("Cancelar")
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }

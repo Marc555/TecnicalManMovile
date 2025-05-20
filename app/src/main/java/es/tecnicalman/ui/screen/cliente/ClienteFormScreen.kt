@@ -5,9 +5,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,10 +77,10 @@ fun ClienteFormScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Detalles de cliente", fontWeight = FontWeight.Bold) },
+                    title = { Text(if (clienteId == null) "Nuevo Cliente" else "Editar Cliente", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                         }
                     }
                 )
@@ -108,7 +111,7 @@ fun ClienteFormScreen(
                 focusedIndicatorColor = Color(0xFFFFA500),
                 unfocusedIndicatorColor = Color.LightGray,
                 cursorColor = Color(0xFFFFA500),
-                errorTextColor = Color.Black, // Mantenemos texto negro también en error
+                errorTextColor = Color.Black,
                 errorLabelColor = Color.Black
             )
 

@@ -68,12 +68,12 @@ fun HomeScreen(navController: NavController) {
                 BotonHomeMenu(
                     text = "Albaranes",
                     modifier = Modifier.weight(1f),
-                    onClick = { }
+                    onClick = { navController.navigate("albaranes") }
                 )
                 BotonHomeMenu(
                     text = "Facturas",
                     modifier = Modifier.weight(1f),
-                    onClick = { }
+                    onClick = { navController.navigate("facturas") }
                 )
             }
 

@@ -1,4 +1,4 @@
-package es.tecnicalman.ui.screen.presupuesto
+package es.tecnicalman.ui.screen.factura
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import es.tecnicalman.viewmodel.ClienteViewModel
-import es.tecnicalman.viewmodel.PresupuestoViewModel
+import es.tecnicalman.viewmodel.FacturaViewModel
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -25,62 +25,56 @@ import java.util.*
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PresupuestoDetailScreen(
+fun FacturaDetailScreen(
     navController: NavHostController,
-    presupuestoId: Long,
-    presupuestoViewModel: PresupuestoViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    facturaId: Long,
+    facturaViewModel: FacturaViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     clienteViewModel: ClienteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    LaunchedEffect(presupuestoId) {
-        presupuestoViewModel.loadPresupuestoById(presupuestoId)
-        presupuestoViewModel.loadLineasByPresupuestoId(presupuestoId)
+    LaunchedEffect(facturaId) {
+        facturaViewModel.loadFacturaById(facturaId)
+        facturaViewModel.loadLineasByFacturaId(facturaId)
     }
 
-    val presupuesto by presupuestoViewModel.presupuestoDetail.collectAsState()
-    val lineas by presupuestoViewModel.lineasPresupuestoDetail.collectAsState()
-    val isLoadingPresupuesto by presupuestoViewModel.isLoading.collectAsState()
-    val errorPresupuesto by presupuestoViewModel.errorMessage.collectAsState()
+    val factura by facturaViewModel.facturaDetail.collectAsState()
+    val lineas by facturaViewModel.lineasFacturaDetail.collectAsState()
+    val isLoadingFactura by facturaViewModel.isLoading.collectAsState()
+    val errorFactura by facturaViewModel.errorMessage.collectAsState()
 
-    LaunchedEffect(presupuesto?.idCliente) {
-        presupuesto?.idCliente?.let { clienteViewModel.fetchClienteById(it) }
+    LaunchedEffect(factura?.idCliente) {
+        factura?.idCliente?.let { clienteViewModel.fetchClienteById(it) }
     }
     val cliente by clienteViewModel.clienteSeleccionado.collectAsState()
     val isLoadingCliente by clienteViewModel.isLoading.collectAsState()
 
-    // Estado para el diálogo de confirmación de borrado
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    // Acción de borrado: elimina líneas y después el presupuesto
-    fun deletePresupuestoAndLineas(presupuestoId: Long) {
-        // Primero elimina todas las líneas del presupuesto
+    fun deleteFacturaAndLineas(facturaId: Long) {
         lineas.forEach { linea ->
-            presupuestoViewModel.deleteLineaPresupuesto(linea.id ?: return@forEach)
+            facturaViewModel.deleteLineaFactura(linea.id ?: return@forEach)
         }
-        // Después elimina el propio presupuesto (puedes mejorar esto con un callback/coroutine chain si quieres esperar confirmación)
-        presupuestoViewModel.deletePresupuesto(presupuestoId)
-        // Vuelve atrás tras borrar
+        facturaViewModel.deleteFactura(facturaId)
         navController.popBackStack()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle Presupuesto") },
+                title = { Text("Detalle Factura") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver",
+                            tint = Color.White)
                     }
                 },
                 actions = {
-                    // Botón editar
                     IconButton(onClick = {
-                        presupuesto?.id?.let {
-                            navController.navigate("presupuestoForm/edit/$presupuestoId")
+                        factura?.id?.let {
+                            navController.navigate("facturaForm/edit/$facturaId")
                         }
                     }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Editar", tint = Color.White)
                     }
-                    // Botón borrar
                     IconButton(onClick = {
                         showDeleteDialog = true
                     }) {
@@ -94,7 +88,7 @@ fun PresupuestoDetailScreen(
             )
         }
     ) { paddingValues ->
-        if (isLoadingPresupuesto || isLoadingCliente) {
+        if (isLoadingFactura || isLoadingCliente) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -106,19 +100,19 @@ fun PresupuestoDetailScreen(
             return@Scaffold
         }
 
-        if (errorPresupuesto != null) {
+        if (errorFactura != null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Error: $errorPresupuesto", color = MaterialTheme.colorScheme.error)
+                Text(text = "Error: $errorFactura", color = MaterialTheme.colorScheme.error)
             }
             return@Scaffold
         }
 
-        presupuesto?.let { pres ->
+        factura?.let { fac ->
             val totalSinIVA = lineas.sumOf { it.cantidad * it.precioUnitario }
             val iva = 0.21
             val totalIVA = totalSinIVA * iva
@@ -135,15 +129,13 @@ fun PresupuestoDetailScreen(
                     .verticalScroll(rememberScrollState())
                     .fillMaxWidth()
             ) {
-                // Información presupuesto
-                Text("Título: ${pres.titulo}", style = MaterialTheme.typography.bodyLarge)
-                Text("Número: ${pres.id}", style = MaterialTheme.typography.bodyLarge)
-                Text("Fecha emisión: ${formatDate(pres.fechaEmitida)}", style = MaterialTheme.typography.bodyMedium)
-                Text("Validez hasta: ${formatDate(pres.fechaValidez)}", style = MaterialTheme.typography.bodyMedium)
+                Text("Título: ${fac.titulo}", style = MaterialTheme.typography.bodyLarge)
+                Text("Número: ${fac.id}", style = MaterialTheme.typography.bodyLarge)
+                Text("Fecha emisión: ${formatDate(fac.fechaEmitida)}", style = MaterialTheme.typography.bodyMedium)
+                Text("Validez hasta: ${formatDate(fac.fechaValidez)}", style = MaterialTheme.typography.bodyMedium)
 
                 Spacer(Modifier.height(16.dp))
 
-                // Datos cliente
                 Text("Cliente", style = MaterialTheme.typography.titleMedium)
                 if (cliente != null) {
                     Text("Nombre: ${cliente?.nombre}")
@@ -157,10 +149,9 @@ fun PresupuestoDetailScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Líneas del presupuesto
                 Text("Líneas", style = MaterialTheme.typography.titleMedium)
                 if (lineas.isEmpty()) {
-                    Text("No hay líneas en este presupuesto.")
+                    Text("No hay líneas en esta factura.")
                 } else {
                     lineas.forEach { linea ->
                         Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -175,13 +166,11 @@ fun PresupuestoDetailScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Condiciones
                 Text("Condiciones", style = MaterialTheme.typography.titleMedium)
-                Text(pres.condiciones.ifEmpty { "No hay condiciones específicas." })
+                Text(fac.condiciones.ifEmpty { "No hay condiciones específicas." })
 
                 Spacer(Modifier.height(16.dp))
 
-                // Totales
                 Text("Totales", style = MaterialTheme.typography.titleMedium)
                 Text("Total sin IVA: ${"%.2f €".format(totalSinIVA)}")
                 Text("IVA (21%): ${"%.2f €".format(totalIVA)}")
@@ -189,16 +178,15 @@ fun PresupuestoDetailScreen(
             }
         }
 
-        // Diálogo de confirmación de borrado
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
                 title = { Text("Confirmar eliminación") },
-                text = { Text("¿Estás seguro de que deseas eliminar este presupuesto y todas sus líneas? Esta acción no se puede deshacer.") },
+                text = { Text("¿Estás seguro de que deseas eliminar esta factura y todas sus líneas? Esta acción no se puede deshacer.") },
                 confirmButton = {
                     TextButton(onClick = {
-                        presupuesto?.id?.let { deleteId ->
-                            deletePresupuestoAndLineas(deleteId)
+                        factura?.id?.let { deleteId ->
+                            deleteFacturaAndLineas(deleteId)
                         }
                         showDeleteDialog = false
                     }) {
