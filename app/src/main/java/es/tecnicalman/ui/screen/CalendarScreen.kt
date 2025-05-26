@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,14 +22,22 @@ import androidx.navigation.NavController
 import es.tecnicalman.model.Tarea
 import es.tecnicalman.ui.component.TareaForm
 import es.tecnicalman.ui.component.TaskModal
+import es.tecnicalman.utils.room.DatabaseInstance
 import es.tecnicalman.viewmodel.TareaViewModel
+import es.tecnicalman.viewmodel.TareaViewModelFactory
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarScreen(navController: NavController, viewModel: TareaViewModel = viewModel()) {
+fun CalendarScreen(navController: NavController) {
+    val context = LocalContext.current
+    val tareaDao = remember { DatabaseInstance.getDatabase(context).tareaDao() }
+    val factory = remember { TareaViewModelFactory(tareaDao, context) }
+    val viewModel: TareaViewModel = viewModel(factory = factory)
+
+
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val tarea by viewModel.tarea.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()

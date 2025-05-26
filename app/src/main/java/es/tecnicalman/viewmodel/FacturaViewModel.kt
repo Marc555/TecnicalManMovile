@@ -1,7 +1,10 @@
 package es.tecnicalman.viewmodel
 
+import android.content.Context
 import android.os.Build
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,9 +12,13 @@ import com.google.gson.Gson
 import es.tecnicalman.model.Factura
 import es.tecnicalman.model.LineaFactura
 import es.tecnicalman.repository.FacturaRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 @RequiresApi(Build.VERSION_CODES.O)
 class FacturaViewModel(
@@ -251,6 +258,29 @@ class FacturaViewModel(
                 _errorMessage.value = "Error: ${e.message}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    // PDF
+    fun descargarFacturaPdf(context: Context, facturaId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val responseBody = repository.downloadPdf(facturaId)
+                val fileName = "factura_FAC${facturaId.toString().padStart(4, '0')}.pdf"
+                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName)
+                val inputStream: InputStream = responseBody.byteStream()
+                val outputStream = FileOutputStream(file)
+                inputStream.copyTo(outputStream)
+                outputStream.close()
+                inputStream.close()
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(context, "PDF descargado en: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(context, "Error al descargar el PDF", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

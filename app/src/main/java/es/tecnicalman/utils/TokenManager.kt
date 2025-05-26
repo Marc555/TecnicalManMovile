@@ -1,4 +1,4 @@
-package es.tecnicalman.util
+package es.tecnicalman.utils
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

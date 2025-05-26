@@ -20,4 +20,7 @@ class AlbaranRepository(private val apiService: AlbaranApiService = RetrofitInst
     suspend fun createLineaAlbaran(lineaAlbaran: LineaAlbaran) = apiService.createLineaAlbaran(lineaAlbaran)
     suspend fun updateLineaAlbaran(id: Long, lineaAlbaran: LineaAlbaran) = apiService.updateLineaAlbaran(id, lineaAlbaran)
     suspend fun deleteLineaAlbaran(id: Long) = apiService.deleteLineaAlbaran(id)
+
+    // PDF
+    suspend fun downloadPdf(id: Long) = apiService.downloadPdf(id)
 }

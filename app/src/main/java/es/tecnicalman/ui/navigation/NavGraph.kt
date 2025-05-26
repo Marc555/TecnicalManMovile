@@ -2,34 +2,50 @@ package es.tecnicalman.ui.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import es.tecnicalman.ui.screen.CalendarScreen
-import es.tecnicalman.ui.screen.ForgotPasswordScreen
-import es.tecnicalman.ui.screen.HomeScreen
-import es.tecnicalman.ui.screen.LoginScreen
-import es.tecnicalman.ui.screen.SplashScreen
-import es.tecnicalman.ui.screen.cliente.ClienteDetailScreen
-import es.tecnicalman.ui.screen.cliente.ClienteFormScreen
-import es.tecnicalman.ui.screen.cliente.ClienteListScreen
-import es.tecnicalman.ui.screen.presupuesto.PresupuestoDetailScreen
-import es.tecnicalman.ui.screen.presupuesto.PresupuestoFormScreen
-import es.tecnicalman.ui.screen.presupuesto.PresupuestoListScreen
-import es.tecnicalman.ui.screen.albaran.AlbaranDetailScreen
-import es.tecnicalman.ui.screen.albaran.AlbaranFormScreen
-import es.tecnicalman.ui.screen.albaran.AlbaranListScreen
-import es.tecnicalman.ui.screen.factura.FacturaDetailScreen
-import es.tecnicalman.ui.screen.factura.FacturaFormScreen
-import es.tecnicalman.ui.screen.factura.FacturaListScreen
+import es.tecnicalman.ui.screen.*
+import es.tecnicalman.ui.screen.cliente.*
+import es.tecnicalman.ui.screen.presupuesto.*
+import es.tecnicalman.ui.screen.albaran.*
+import es.tecnicalman.ui.screen.factura.*
+import es.tecnicalman.viewmodel.NetworkViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "splash") {
+    val networkViewModel: NetworkViewModel = viewModel()
+    val isConnected by networkViewModel.isConnected.collectAsState()
+    // Controla si ya navegamos a offline
+    var sentToOffline by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isConnected) {
+        if (!isConnected && !sentToOffline) {
+            navController.navigate("offline") {
+                popUpTo(0) { inclusive = true }
+            }
+            sentToOffline = true
+        } else if (isConnected && sentToOffline) {
+            navController.navigate("splash") {
+                popUpTo(0) { inclusive = true }
+            }
+            sentToOffline = false
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = "splash"
+    ) {
+        composable("offline") {
+            OfflineScreen()
+        }
+
         composable("splash") {
             SplashScreen(navController)
         }
@@ -63,23 +79,17 @@ fun AppNavGraph(navController: NavHostController) {
                 navController.navigate("clienteDetails/$clienteId")
             })
         }
-
-        // Ruta para los detalles de un cliente
         composable("clienteDetails/{clienteId}") { backStackEntry ->
             val clienteId = backStackEntry.arguments?.getString("clienteId")?.toLong() ?: -1L
             ClienteDetailScreen(navController, clienteId = clienteId) {
-                navController.popBackStack() // Regresar a la pantalla anterior
+                navController.popBackStack()
             }
         }
-
-        // Ruta para crear un cliente
         composable("clienteForm") {
             ClienteFormScreen(navController, clienteId = null) {
                 navController.popBackStack()
             }
         }
-
-        // Ruta para editar un cliente existente
         composable("clienteForm/{clienteId}") { backStackEntry ->
             val clienteId = backStackEntry.arguments?.getString("clienteId")?.toLongOrNull()
             ClienteFormScreen(navController, clienteId = clienteId) {
@@ -87,30 +97,21 @@ fun AppNavGraph(navController: NavHostController) {
             }
         }
 
-
         // PRESUPUESTOS
         composable("presupuestos") {
-            // Lista de presupuestos
             PresupuestoListScreen(navController, onPresupuestoClick = { presupuesto ->
                 navController.navigate("presupuestoDetails/${presupuesto.id}")
             })
         }
-
         composable("presupuestoDetails/{presupuestoId}",
             arguments = listOf(navArgument("presupuestoId") { type = NavType.LongType })
         ) { backStackEntry ->
             val presupuestoId = backStackEntry.arguments?.getLong("presupuestoId") ?: 0L
             PresupuestoDetailScreen(navController = navController, presupuestoId = presupuestoId)
         }
-
-
-        // Crear un nuevo presupuesto
         composable("presupuestoForm") {
-            PresupuestoFormScreen(
-                navController)
+            PresupuestoFormScreen(navController)
         }
-
-        // Editar un presupuesto existente
         composable("presupuestoForm/edit/{presupuestoId}") {
             PresupuestoFormScreen(
                 navController,
@@ -123,20 +124,15 @@ fun AppNavGraph(navController: NavHostController) {
                 navController.navigate("albaranDetails/${albaran.id}")
             })
         }
-
         composable("albaranDetails/{albaranId}",
             arguments = listOf(navArgument("albaranId") { type = NavType.LongType })
         ) { backStackEntry ->
             val albaranId = backStackEntry.arguments?.getLong("albaranId") ?: 0L
             AlbaranDetailScreen(navController = navController, albaranId = albaranId)
         }
-
-        // Crear un nuevo albarán
         composable("albaranForm") {
             AlbaranFormScreen(navController)
         }
-
-        // Editar un albarán existente
         composable("albaranForm/edit/{albaranId}") {
             AlbaranFormScreen(
                 navController,
@@ -149,20 +145,15 @@ fun AppNavGraph(navController: NavHostController) {
                 navController.navigate("facturaDetails/${factura.id}")
             })
         }
-
         composable("facturaDetails/{facturaId}",
             arguments = listOf(navArgument("facturaId") { type = NavType.LongType })
         ) { backStackEntry ->
             val facturaId = backStackEntry.arguments?.getLong("facturaId") ?: 0L
             FacturaDetailScreen(navController = navController, facturaId = facturaId)
         }
-
-        // Crear una nueva factura
         composable("facturaForm") {
             FacturaFormScreen(navController)
         }
-
-        // Editar una factura existente
         composable("facturaForm/edit/{facturaId}") {
             FacturaFormScreen(
                 navController,

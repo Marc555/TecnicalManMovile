@@ -2,6 +2,7 @@ package es.tecnicalman.api
 
 import es.tecnicalman.model.Albaran
 import es.tecnicalman.model.LineaAlbaran
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -35,4 +36,8 @@ interface AlbaranApiService {
 
     @DELETE("lineas-albaran/{id}")
     suspend fun deleteLineaAlbaran(@Path("id") id: Long): Response<Void>
+
+    // PDF
+    @GET("albaranpdf/{id}")
+    suspend fun downloadPdf(@Path("id") id: Long): ResponseBody
 }

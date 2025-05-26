@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import es.tecnicalman.api.AuthService
 import es.tecnicalman.api.RetrofitInstance
 import es.tecnicalman.model.LoginRequest
-import es.tecnicalman.util.TokenManager
-import es.tecnicalman.util.TokenProvider
+import es.tecnicalman.utils.TokenManager
+import es.tecnicalman.utils.TokenProvider
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

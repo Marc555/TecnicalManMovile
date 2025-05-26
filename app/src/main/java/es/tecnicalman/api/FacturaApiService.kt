@@ -2,6 +2,7 @@ package es.tecnicalman.api
 
 import es.tecnicalman.model.Factura
 import es.tecnicalman.model.LineaFactura
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -35,4 +36,8 @@ interface FacturaApiService {
 
     @DELETE("lineas-factura/{id}")
     suspend fun deleteLineaFactura(@Path("id") id: Long): Response<Void>
+
+    // PDF
+    @GET("facturapdf/{id}")
+    suspend fun downloadPdf(@Path("id") id: Long): ResponseBody
 }

@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.navigation.compose.rememberNavController
 import es.tecnicalman.ui.navigation.AppNavGraph
 import es.tecnicalman.ui.theme.TecnicalmanTheme
-import es.tecnicalman.util.TokenManager // <- Asegúrate de importar esto
+import es.tecnicalman.utils.TokenManager // <- Asegúrate de importar esto
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)

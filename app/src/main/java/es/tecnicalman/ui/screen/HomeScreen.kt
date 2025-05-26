@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import es.tecnicalman.util.TokenManager
+import es.tecnicalman.utils.TokenManager
 import kotlinx.coroutines.launch
 
 @Composable

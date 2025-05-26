@@ -16,7 +16,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import es.tecnicalman.util.TokenManager
+import es.tecnicalman.utils.TokenManager
 import es.tecnicalman.viewmodel.AuthViewModel
 import es.tecnicalman.viewmodel.LoginState
 import kotlinx.coroutines.launch

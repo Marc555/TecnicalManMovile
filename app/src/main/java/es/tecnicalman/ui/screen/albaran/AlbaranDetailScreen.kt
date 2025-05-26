@@ -9,11 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import es.tecnicalman.viewmodel.ClienteViewModel
@@ -48,6 +50,7 @@ fun AlbaranDetailScreen(
     val isLoadingCliente by clienteViewModel.isLoading.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     fun deleteAlbaranAndLineas(albaranId: Long) {
         lineas.forEach { linea ->
@@ -63,11 +66,25 @@ fun AlbaranDetailScreen(
                 title = { Text("Detalle Albarán") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver",
-                            tint = Color.White)
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
                     }
                 },
                 actions = {
+                    // Botón descargar PDF
+                    IconButton(
+                        onClick = {
+                            albaran?.id?.let {
+                                albaranViewModel.descargarAlbaranPdf(context, it)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FileDownload,
+                            contentDescription = "Descargar PDF",
+                            tint = Color.White
+                        )
+                    }
+                    // Botón editar
                     IconButton(onClick = {
                         albaran?.id?.let {
                             navController.navigate("albaranForm/edit/$albaranId")
@@ -75,6 +92,7 @@ fun AlbaranDetailScreen(
                     }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Editar", tint = Color.White)
                     }
+                    // Botón borrar
                     IconButton(onClick = {
                         showDeleteDialog = true
                     }) {

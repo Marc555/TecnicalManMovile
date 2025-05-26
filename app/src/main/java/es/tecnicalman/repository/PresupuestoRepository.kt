@@ -20,4 +20,7 @@ class PresupuestoRepository(private val apiService: PresupuestoApiService = Retr
     suspend fun createLineaPresupuesto(lineaPresupuesto: LineaPresupuesto) = apiService.createLineaPresupuesto(lineaPresupuesto)
     suspend fun updateLineaPresupuesto(id: Long, lineaPresupuesto: LineaPresupuesto) = apiService.updateLineaPresupuesto(id, lineaPresupuesto)
     suspend fun deleteLineaPresupuesto(id: Long) = apiService.deleteLineaPresupuesto(id)
+
+    // PDF
+    suspend fun downloadPDF(id: Long) = apiService.downloadPdf(id)
 }

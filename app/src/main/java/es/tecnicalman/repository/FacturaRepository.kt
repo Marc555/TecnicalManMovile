@@ -20,4 +20,7 @@ class FacturaRepository(private val apiService: FacturaApiService = RetrofitInst
     suspend fun createLineaFactura(lineaFactura: LineaFactura) = apiService.createLineaFactura(lineaFactura)
     suspend fun updateLineaFactura(id: Long, lineaFactura: LineaFactura) = apiService.updateLineaFactura(id, lineaFactura)
     suspend fun deleteLineaFactura(id: Long) = apiService.deleteLineaFactura(id)
+
+    //PDF
+    suspend fun downloadPdf(id: Long) = apiService.downloadPdf(id)
 }

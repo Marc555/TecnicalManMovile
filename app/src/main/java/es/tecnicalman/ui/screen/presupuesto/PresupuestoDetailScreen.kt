@@ -1,6 +1,7 @@
 package es.tecnicalman.ui.screen.presupuesto
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,11 +10,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import es.tecnicalman.viewmodel.ClienteViewModel
@@ -50,6 +53,8 @@ fun PresupuestoDetailScreen(
     // Estado para el diálogo de confirmación de borrado
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     // Acción de borrado: elimina líneas y después el presupuesto
     fun deletePresupuestoAndLineas(presupuestoId: Long) {
         // Primero elimina todas las líneas del presupuesto
@@ -72,6 +77,20 @@ fun PresupuestoDetailScreen(
                     }
                 },
                 actions = {
+                    // Botón descargar PDF
+                    IconButton(
+                        onClick = {
+                            presupuesto?.id?.let {
+                                presupuestoViewModel.descargarPresupuestoPdf(context, it)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FileDownload,
+                            contentDescription = "Descargar PDF",
+                            tint = Color.White
+                        )
+                    }
                     // Botón editar
                     IconButton(onClick = {
                         presupuesto?.id?.let {

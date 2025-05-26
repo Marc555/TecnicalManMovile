@@ -2,6 +2,7 @@ package es.tecnicalman.api
 
 import es.tecnicalman.model.Presupuesto
 import es.tecnicalman.model.LineaPresupuesto
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -35,4 +36,8 @@ interface PresupuestoApiService {
 
     @DELETE("lineas-presupuesto/{id}")
     suspend fun deleteLineaPresupuesto(@Path("id") id: Long): Response<Void>
+
+    // PDF
+    @GET("presupuestopdf/{id}")
+    suspend fun downloadPdf(@Path("id") id: Long): ResponseBody
 }
